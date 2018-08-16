@@ -23,7 +23,7 @@ suppressPackageStartupMessages({
 
 
 # Randy: changes to your document here
-
+# Randy: I made these changes too
 Load Salmon Escapement data from KNB
 **tryCatch** says first try this and if not, catch this option. 
 **Error** is a specific if statements for when there are errors.
