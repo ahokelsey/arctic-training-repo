@@ -24,7 +24,7 @@ suppressPackageStartupMessages({
 
 # Randy: changes to your document here
 
-Load Salmon Escapement data from KNB
+Load Salmon Escapement data from **KNB**
 **tryCatch** says first try this and if not, catch this option. 
 **Error** is a specific if statements for when there are errors.
 The deleted **message** would have been used to alert users of the problem(s).
