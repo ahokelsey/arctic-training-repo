@@ -43,7 +43,7 @@ esc <- tryCatch(
 head(esc)
 ```
 
-Prepare the dataset for calculating medians:
+Prepare the dataset for calculating the **mean**:
 - Summarize daily escapment across rivers within a region.
 - Group by species, region, year and location, since we will be calculating a median by those.
 - Summarize daily totals of escapement.
