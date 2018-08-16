@@ -4,7 +4,7 @@ author: "Kelsey Aho"
 date: "August 16, 2018"
 output: html_document
 
-# Randy: changes to your document here
+
 ---
 
 ```{r setup, include=FALSE}
@@ -21,6 +21,8 @@ suppressPackageStartupMessages({
 })
 ```
 
+
+# Randy: changes to your document here
 
 Load Salmon Escapement data from KNB
 **tryCatch** says first try this and if not, catch this option. 
