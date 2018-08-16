@@ -3,6 +3,8 @@ title: "Making a Webpage"
 author: "Kelsey Aho"
 date: "August 16, 2018"
 output: html_document
+
+# Randy: changes to your document here
 ---
 
 ```{r setup, include=FALSE}
