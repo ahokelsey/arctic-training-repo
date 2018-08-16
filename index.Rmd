@@ -9,22 +9,91 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
+suppressPackageStartupMessages({
+  library(leaflet)
+  library(dplyr)
+  library(tidyr)
+  library(ggplot2)
+  library(DT)
+})
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
+Load Salmon Escapement data from KNB
+**tryCatch** says first try this and if not, catch this option. 
+**Error** is a specific if statements for when there are errors.
+The deleted **message** would have been used to alert users of the problem(s).
+```{r}
+data_url <- "https://knb.ecoinformatics.org/knb/d1/mn/v2/object/knb.92020.1"
+# data_url <- "https://knb.ecoinformatics.org/knb/d1/mn/v2/object/urn%3Auuid%3Af119a05b-bbe7-4aea-93c6-85434dcb1c5e"
+esc <- tryCatch(
+  #Line 29 says use local copy, if it does not exist then go to webpage.  
+  read.csv("data/escapement.csv", stringsAsFactors = FALSE),
+    error=function(cond) {
+        esc <- read.csv(url(data_url, method = "libcurl"), stringsAsFactors = FALSE)
+        return(esc)
+    }
+)
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+head(esc)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Prepare the dataset for calculating medians:
+- Summarize daily escapment across rivers within a region.
+- Group by species, region, year and location, since we will be calculating a median by those.
+- Summarize daily totals of escapement.
+- Group by species
+- Summarize the mean escapement.
+```{r}
+median_esc <- esc %>% 
+  separate(sampleDate, c("Year", "Month", "Day"), sep = "-") %>% 
+  group_by(Species, SASAP.Region, Year, Location) %>% 
+  summarize(escapement = sum(DailyCount)) %>% 
+  group_by(Species) %>% 
+  summarize(median_escapement = median(escapement))
+
+
+head(median_esc)
+```
+
+
+Plot results using *ggplot* which uses a **+** instead of **%>%** which *tidyr* uses.
+```{r}
+ggplot(median_esc, aes(Species, median_escapement)) +
+  geom_col() +
+  coord_flip()
+
+```
+
+
+Put unique location results into a table using **datatable**.
+```{r}
+locations <- esc %>% 
+  distinct(Location, Latitude, Longitude) %>% 
+  drop_na()
+datatable(locations)
+
+```
+
+
+Create a map using **leaflet**.
+```{r}
+leaflet(locations) %>% 
+  addTiles() %>% 
+  addMarkers(~ Longitude, ~ Latitude, popup = ~ Location)
+
+```
+
+
+To add an OSM use **addTiles**. Use **addMarkers** for the locations and are based on lat long.
+```{r}
+locs <- locations %>% mutate(Longitude = abs(Longitude) * -1)
+
+leaflet(locs) %>% 
+  addTiles() %>% 
+  addMarkers(~ Longitude, ~ Latitude, popup = ~ Location)
+
+```
+
+
