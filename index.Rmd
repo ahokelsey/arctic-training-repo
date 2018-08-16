@@ -22,7 +22,7 @@ suppressPackageStartupMessages({
 ```
 
 
-changes to your document here
+Randy changes to your document here
 Load Salmon Escapement data from KNB
 
 **tryCatch** says first try this and if not, catch this option. 
