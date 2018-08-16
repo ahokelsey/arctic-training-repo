@@ -75,6 +75,102 @@ head(catch_df)
 
 
 
+16 August 2018
+
+**Split-Apply-Combine**
+
+Group by Region
+```{r}
+catch_region <- catch_df %>% 
+  group_by(Region) %>%
+  summarise(mean_catch = mean(catch))
+
+head(catch_region)
+```
+
+Group by Species
+```{r}
+catch_species <- catch_df %>% 
+  group_by(species) %>%
+  summarise(mean_catch = mean(catch))
+
+head(catch_species)
+```
+
+
+**Group** by Region and species. Calculate **mean**, **stdev**, and **number** of observations.
+**na.rm** removes the NAs that way the statistics can be calculated.
+```{r}
+catch_mean <- catch_df %>% 
+  group_by(Region, species) %>% 
+  #calculate mean, sd, n
+  summarize(catch_mean = mean(catch, na.rm = T ),
+            catch_stdev = sd(catch, na.rm = T ),
+            num_obs = n())
+
+head(catch_mean)
+```
+
+
+Filter out __ based on a condition
+```{r}
+catch_mean <- catch_df %>% 
+  group_by(Region, species) %>% 
+  #calculate mean, sd, n
+  summarize(catch_mean = mean(catch, na.rm = T ),
+            catch_stdev = sd(catch, na.rm = T ),
+            num_obs = n()) %>% 
+  #filter for Chinook
+  filter(species == "Chinook")
+
+head(catch_mean)
+
+
+```
+
+**Filter** by year and group by species (*Chinook*)
+```{r}
+catch_year <- catch_df %>% 
+  filter (Year > 1990 & species == "Chinook") %>% 
+  group_by(Year, species) %>% 
+  summarize(catch_sum = sum(catch)) 
+  
+
+head(catch_year)
+```
+
+Using **Filter**::Or [**|**]
+```{r}
+catch_year <- catch_df %>% 
+  filter (Year > 1990 | Year < 1900) %>% 
+  group_by(Year, species) %>% 
+  summarize(catch_sum = sum(catch)) 
+  
+head(catch_year)
+```
+
+
+
+**Joins** "bringing information together from two tables"
+```{r}
+region_defs <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1", method = "libcurl"),
+                        stringsAsFactors = FALSE)
+
+region_defs <- region_defs %>% 
+  select(code, mgmtArea)
+
+head(region_defs)
+
+```
+
+
+
+```{r}
+catch_joined <- left_join(catch_df, region_defs, by = c("Region" = "code"))
+
+head(catch_joined)
+
+```
 
 
 
